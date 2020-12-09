@@ -1,6 +1,6 @@
 package de.rki.coronawarnapp.contactdiary.model
 
-import java.time.Instant
+import org.joda.time.Instant
 
 data class DefaultContactDiaryElement(
     override val createdAt: Instant,

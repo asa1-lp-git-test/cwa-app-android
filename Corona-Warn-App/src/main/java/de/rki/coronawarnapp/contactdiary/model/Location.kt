@@ -1,5 +1,7 @@
 package de.rki.coronawarnapp.contactdiary.model
 
-interface Location {
+import de.rki.coronawarnapp.util.lists.HasStableId
+
+interface Location : HasStableId {
     var locationName: String
 }

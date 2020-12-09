@@ -1,5 +1,7 @@
 package de.rki.coronawarnapp.contactdiary.model
 
-interface Person {
+import de.rki.coronawarnapp.util.lists.HasStableId
+
+interface Person : HasStableId {
     var fullName: String
 }
