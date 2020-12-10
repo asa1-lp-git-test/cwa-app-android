@@ -3,8 +3,8 @@ package de.rki.coronawarnapp.contactdiary.ui.day
 import androidx.lifecycle.asLiveData
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
-import de.rki.coronawarnapp.contactdiary.storage.ContactDiaryRepository
 import de.rki.coronawarnapp.contactdiary.ui.day.tabs.ContactDiaryDayTab
+import de.rki.coronawarnapp.ui.SingleLiveEvent
 import de.rki.coronawarnapp.util.coroutine.DispatcherProvider
 import de.rki.coronawarnapp.util.viewmodel.CWAViewModel
 import de.rki.coronawarnapp.util.viewmodel.CWAViewModelFactory
@@ -15,17 +15,21 @@ import org.joda.time.format.DateTimeFormat
 
 class ContactDiaryDayViewModel @AssistedInject constructor(
     dispatcherProvider: DispatcherProvider,
-    @Assisted selectedDay: Long,
-    private val contactDiaryRepository: ContactDiaryRepository
+    @Assisted selectedDay: Long
 ) : CWAViewModel(dispatcherProvider = dispatcherProvider) {
     private val dateFormat by lazy {
         DateTimeFormat.forPattern("EEEE, dd.MM.yy")
     }
 
+    private val activeInstant = Instant.ofEpochSecond(selectedDay)
+
     val contactDiaryTabs = listOf(ContactDiaryDayTab.PERSON_TAB, ContactDiaryDayTab.LOCATION_TAB)
 
     private val currentTab = MutableStateFlow(contactDiaryTabs[0])
-    private val displayedDay = MutableStateFlow(Instant.ofEpochSecond(selectedDay))
+    private val displayedDay = MutableStateFlow(activeInstant)
+
+    val createPerson = SingleLiveEvent<Unit>()
+    val createLocation = SingleLiveEvent<Unit>()
 
     val uiState = currentTab.combine(displayedDay) { currentTab, day ->
         UIState(
@@ -39,11 +43,10 @@ class ContactDiaryDayViewModel @AssistedInject constructor(
     }
 
     fun onCreateButtonClicked() {
-        // TODO replace with actual implementation
         launch {
             when (currentTab.value) {
-                ContactDiaryDayTab.LOCATION_TAB -> contactDiaryRepository.addDummyLocation()
-                ContactDiaryDayTab.PERSON_TAB -> contactDiaryRepository.addDummyPerson()
+                ContactDiaryDayTab.LOCATION_TAB -> createLocation.postValue(null)
+                ContactDiaryDayTab.PERSON_TAB -> createPerson.postValue(null)
             }
         }
     }
